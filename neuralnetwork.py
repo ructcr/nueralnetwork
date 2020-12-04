@@ -18,39 +18,21 @@ class Network(object):
                 print ("Epoch {0}:{1}/{2}".format(j,self.evaluate(test_data),n_test))
             else:
                 print ("Epoch {0} complete".format(j))
-    def update_mini_batch(self,mini_batch,eta):
-        nabla_b=[np.zeros(b.shape) for b in self.biases]
-        nabla_w=[np.zeros(w.shape) for w in self.weights]
-        #print(nabla_b,'\n',nabla_w)
+    def update_mini_batch(self,mini_batch,eta):        
         for x,y in mini_batch:
-            #print('x:',x,' y:',y)
-            delta_nabla_b,delta_nabla_w=self.backprop(x,y)
-            #print('deltas:',delta_nabla_b,delta_nabla_w)
-            """ nabla_b=[nb+dnb for nb,dnb in zip(nabla_b,delta_nabla_b)]
-            nabla_w=[nw+dnw for nw,dnw in zip(nabla_w,delta_nabla_w)]
-            self.weights=[w-(eta/len(mini_batch))*nw for w,nw in zip(self.weights,nabla_w)]
-            self.biases=[b-(eta/len(mini_batch))*nb for b,nb in zip(self.biases,nabla_b)] """
-    def feedfoward(self,a):
+            layers=self.feedfoward(x)
+            self.backprop(layers,y)
+          
+    def feedfoward(self,layer):
+        temp_layer=layer 
+        layers=[temp_layer]
         for b,w in zip(self.biases,self.weights):
-            a=self.sigmoid(np.dot(a,w)+b)
-        return a
-    def backprop(self,x,y):
-        nabla_b=[np.zeros(b.shape) for b in self.biases]
-        nabla_w=[np.zeros(w.shape) for w in self.weights]
-        activation=x
-        activations=[x]
-        zs=[]
-        for b,w in zip(self.biases,self.weights):
-            #print(b,'\n\n',w,'\n\n\n')
-            z=np.dot(activation,w)+b
-            zs.append[z]
-            activation=self.sigmoid(z)
-            activations.append(activation)             
-            #print(activation)
-        delta=self.cost_derivative(activations[-1],y)*self.sigmoid_prime(zs[-1])
-        nabla_b[-1]=delta
-        nabla_w[-1]=np.dot(delta,activations[-2].transpose())
-        return(nabla_b,nabla_w)
+            temp_layer=self.sigmoid(np.dot(temp_layer,w)+b)
+            layers.append(temp_layer)
+        return layers
+    def backprop(self,layers,y):
+        for i in range(self.weights)
+       
     def cost_derivative(self,output_activations,y):
         return(output_activations-y)
     def evaluate(self,test_data):
@@ -61,5 +43,14 @@ class Network(object):
     def sigmoid_prime(self,z):
         return sigmoid(z)*(1-sigmoid(z))
 
-net=Network([3,5,2])
-net.SGD([([0,0,1],1),([0,1,0],0),([1,0,0],1)],1,3,0.3)
+training_data=[([0,0,1],1),([0,1,0],0),([1,0,0],1)]
+
+inodes=3
+onodes=2
+mnodes=5
+net=Network([inodes,mnodes,onodes])#构建神经网络的随机初始值
+
+epochs=1
+mini_batch=3
+eta=0.3
+net.SGD(training_data,epochs,mini_batch,eta)#用梯度下降法训练神经网络
