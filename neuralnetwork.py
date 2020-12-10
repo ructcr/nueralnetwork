@@ -31,10 +31,13 @@ class Network(object):
             layers=self.feedfoward(x)                                           
             t_weights,t_biases=self.backprop(layers,y)        
             s_weights=[sw+tw for sw,tw in zip(s_weights,t_weights)]            
-            s_biases=[sb+tb for sb,tb in zip(s_biases,t_biases)]        
+            s_biases=[sb+tb for sb,tb in zip(s_biases,t_biases)]      
+            print('Weight:',self.weights)  
+            print('Output:',layers[-1])
+            print('E:',((layers[-1][0]-y[0])*(layers[-1][0]-y[0])+(layers[-1][1]-y[1])*(layers[-1][1]-y[1]))/2)
         self.weights=[w-sw*eta/len(mini_batch) for w,sw in zip(self.weights,s_weights)]        
         #self.biases=[b-sb*eta/len(mini_batch) for b,sb in zip(self.biases,s_biases)]      
-        print(self.weights)          
+        
     def feedfoward(self,layer):
         temp_layer=layer 
         layers=[temp_layer]
@@ -49,9 +52,16 @@ class Network(object):
         dnetO=(layers[-1]-y)*(layers[-1]*(1-layers[-1]))        
         t_weights[-1]=np.dot(layers[-2].reshape(len(layers[-2]),1),dnetO.reshape(1,len(layers[-1])))
         t_biases[-1]=dnetO
-        for i in range(2,len(self.sizes)):
-            dnetO=(dnetO.dot(self.weights[-i+1]).T)*(layers[-i]*(1-layers[-i]))            
+        for i in range(2,len(layers)):
+            dnetO=(dnetO.dot(self.weights[-i+1].T))*(layers[-i]*(1-layers[-i]))                                          
             t_weights[-i]=(layers[-i-1].reshape(len(layers[-i-1]),1)).dot(dnetO.reshape(1,len(layers[-i])))            
+            """ dW1=layers[-i-1]
+            dnetM=layers[-i]*(1-layers[-i])
+            dM=self.weights[-i+1]
+            dnetO=layers[-i+1]*(1-layers[-i+1])
+            dO=layers[-i+1]-y
+            t_weights[-i]=dW1.reshape(len(dW1),1).dot((dnetM*(dM.dot(dnetO*dO))).reshape(1,len(dnetM)))      """
+                                               
             t_biases[-i]=dnetO
         return t_weights,t_biases        
     def evaluate(self,test_data):
@@ -72,3 +82,4 @@ epochs=2
 mini_batch_size=1
 eta=0.5
 net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta)#用梯度下降法训练神经网络
+#net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta,test_data)#用梯度下降法训练神经网络
