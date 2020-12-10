@@ -5,10 +5,10 @@ from testdata import test_data
 class Network(object):
     def __init__(self,sizes):
         self.sizes=sizes        
-        #self.weights=[np.random.randn(x,y) for x,y in zip(sizes[:-1],sizes[1:])]                
-        #self.biases=[np.random.randn(x) for x in sizes[1:]]
-        self.weights=np.array([[[0.15,0.25],[0.20,0.30]],[[0.40,0.50],[0.45,0.55]]])
-        self.biases=np.array([[0.35,0.35],[0.60,0.60]])
+        self.weights=[np.random.randn(x,y) for x,y in zip(sizes[:-1],sizes[1:])]                
+        self.biases=[np.random.randn(x) for x in sizes[1:]]
+        #self.weights=np.array([[[0.15,0.25],[0.20,0.30]],[[0.40,0.50],[0.45,0.55]]])        
+        #self.biases=np.array([[0.35,0.35],[0.60,0.60]])
     def mini_batch_SGD(self,training_data,epochs,mini_batch_size,eta,test_data=None):
         if test_data:n_test=len(test_data)
         n=len(training_data)        
@@ -29,23 +29,20 @@ class Network(object):
         s_biases=[np.zeros(x.shape) for x in self.biases]
         for x,y in mini_batch:                                
             layers=self.feedfoward(x)                                           
-            t_weights,t_biases=self.backprop(layers,y)        
+            t_weights,t_biases=self.backprop(layers,y)    
             s_weights=[sw+tw for sw,tw in zip(s_weights,t_weights)]            
-            s_biases=[sb+tb for sb,tb in zip(s_biases,t_biases)]      
-            print('Weight:',self.weights)  
-            print('Output:',layers[-1])
-            print('E:',((layers[-1][0]-y[0])*(layers[-1][0]-y[0])+(layers[-1][1]-y[1])*(layers[-1][1]-y[1]))/2)
+            s_biases=[sb+tb for sb,tb in zip(s_biases,t_biases)]                  
         self.weights=[w-sw*eta/len(mini_batch) for w,sw in zip(self.weights,s_weights)]        
-        #self.biases=[b-sb*eta/len(mini_batch) for b,sb in zip(self.biases,s_biases)]      
+        self.biases=[b-sb*eta/len(mini_batch) for b,sb in zip(self.biases,s_biases)]      
         
     def feedfoward(self,layer):
         temp_layer=layer 
         layers=[temp_layer]
         for b,w in zip(self.biases,self.weights):
-            net=np.dot(temp_layer,w)+b                                 
-            temp_layer=self.sigmoid(net)             
+            net=np.dot(temp_layer,w)+b                                   
+            temp_layer=self.sigmoid(net)                         
             layers.append(temp_layer)
-        return layers
+        return np.array(layers)
     def backprop(self,layers,y):
         t_weights=[np.zeros(x.shape) for x in self.weights]
         t_biases=[np.zeros(x.shape) for x in self.biases]        
@@ -60,8 +57,7 @@ class Network(object):
             dM=self.weights[-i+1]
             dnetO=layers[-i+1]*(1-layers[-i+1])
             dO=layers[-i+1]-y
-            t_weights[-i]=dW1.reshape(len(dW1),1).dot((dnetM*(dM.dot(dnetO*dO))).reshape(1,len(dnetM)))      """
-                                               
+            t_weights[-i]=dW1.reshape(len(dW1),1).dot((dnetM*(dM.dot(dnetO*dO))).reshape(1,len(dnetM)))                                                     """
             t_biases[-i]=dnetO
         return t_weights,t_biases        
     def evaluate(self,test_data):
@@ -70,16 +66,16 @@ class Network(object):
     def sigmoid(self,z):
         return 1.0/(1.0+np.exp(-z))
     
-#training_data=training_data().get_data()
-#test_data=test_data().get_data()
-training_data=np.array([[[0.05,0.1],[0.01,0.99]]])
-input_nodes=2
-mid_nodes=2
-output_nodes=2
-net=Network([input_nodes,mid_nodes,output_nodes])#构建神经网络的随机初始值
+training_data=training_data().get_data()
+test_data=test_data().get_data()
+#training_data=np.array([[[0.05,0.1],[0.01,0.99]]])
+input_nodes=784
+mid_nodes=30
+output_nodes=10
+net=Network([input_nodes,50,50,output_nodes])#构建神经网络的随机初始值
 
-epochs=2
-mini_batch_size=1
-eta=0.5
-net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta)#用梯度下降法训练神经网络
-#net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta,test_data)#用梯度下降法训练神经网络
+epochs=40
+mini_batch_size=32
+eta=0.1
+#net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta)#用梯度下降法训练神经网络
+net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta,test_data)#用梯度下降法训练神经网络
