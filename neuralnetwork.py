@@ -24,6 +24,8 @@ class Network(object):
                 print ("Epoch {0}:{1}/{2}".format(j,self.evaluate(test_data),n_test))
             else:
                 print ("Epoch {0} complete".format(j))
+        np.save('trained_weights.npy',self.weights,allow_pickle=True)
+        np.save('trained_biases.npy',self.biases,allow_pickle=True)
     def update_mini_batch(self,mini_batch,eta):        
         s_weights=[np.zeros(x.shape) for x in self.weights]
         s_biases=[np.zeros(x.shape) for x in self.biases]
@@ -42,7 +44,7 @@ class Network(object):
             net=np.dot(temp_layer,w)+b                                   
             temp_layer=self.sigmoid(net)                         
             layers.append(temp_layer)
-        return np.array(layers)
+        return layers
     def backprop(self,layers,y):
         t_weights=[np.zeros(x.shape) for x in self.weights]
         t_biases=[np.zeros(x.shape) for x in self.biases]        
@@ -61,7 +63,7 @@ class Network(object):
             t_biases[-i]=dnetO
         return t_weights,t_biases        
     def evaluate(self,test_data):
-        test_results=[(np.argmax(self.feedfoward(x)[-1]),y) for (x,y) in test_data]
+        test_results=[(np.argmax(self.feedfoward(x)[-1]),np.argmax(y)) for (x,y) in test_data]
         return sum(int(x==y) for (x,y) in test_results)
     def sigmoid(self,z):
         return 1.0/(1.0+np.exp(-z))
@@ -72,10 +74,10 @@ test_data=test_data().get_data()
 input_nodes=784
 mid_nodes=30
 output_nodes=10
-net=Network([input_nodes,50,50,output_nodes])#构建神经网络的随机初始值
+net=Network([input_nodes,20,20,20,output_nodes])#构建神经网络的随机初始值
 
-epochs=40
+epochs=500
 mini_batch_size=32
 eta=0.1
 #net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta)#用梯度下降法训练神经网络
-net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta,test_data)#用梯度下降法训练神经网络
+net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta,training_data)#用梯度下降法训练神经网络
