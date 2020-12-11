@@ -63,7 +63,7 @@ class Network(object):
             t_biases[-i]=dnetO
         return t_weights,t_biases        
     def evaluate(self,test_data):
-        test_results=[(np.argmax(self.feedfoward(x)[-1]),np.argmax(y)) for (x,y) in test_data]
+        test_results=[(np.argmax(np.abs(self.feedfoward(x)[-1])),np.argmax(y)) for (x,y) in test_data]
         return sum(int(x==y) for (x,y) in test_results)
     def sigmoid(self,z):
         return 1.0/(1.0+np.exp(-z))
@@ -74,9 +74,9 @@ test_data=test_data().get_data()
 input_nodes=784
 mid_nodes=30
 output_nodes=10
-net=Network([input_nodes,20,20,20,output_nodes])#构建神经网络的随机初始值
+net=Network([input_nodes,64,output_nodes])#构建神经网络的随机初始值
 
-epochs=500
+epochs=50
 mini_batch_size=32
 eta=0.1
 #net.mini_batch_SGD(training_data,epochs,mini_batch_size,eta)#用梯度下降法训练神经网络
