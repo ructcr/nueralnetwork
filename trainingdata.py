@@ -16,7 +16,7 @@ class training_data():
             coloumns=int(f.read(4).hex(),16)            
             self.datas=np.frombuffer(f.read(),dtype=np.uint8).reshape(60000,784).copy()
             self.datas[self.datas<30]=0
-            self.datas[self.datas>=30]=255
+            self.datas[self.datas>=30]=1
     def get_data(self):                                
         data=[]        
         for i in range(60000):

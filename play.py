@@ -4,7 +4,7 @@ weights=np.load('trained_weights.npy',allow_pickle=True)
 biases=np.load('trained_biases.npy',allow_pickle=True)
 imgGrey=cv2.imread('digit.png',0)
 imgGrey[imgGrey<30]=0
-imgGrey[imgGrey>30]=255
+imgGrey[imgGrey>=30]=1
 imgGrey=cv2.resize(imgGrey,(28,28),interpolation=cv2.INTER_AREA)
 cv2.imshow('imggrey',imgGrey)
 cv2.waitKey()
